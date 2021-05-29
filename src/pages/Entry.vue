@@ -1,50 +1,56 @@
 <template>
-  <div class="main">
-    <div class="title">社区疫情签到</div>
-    <div class="slogen">众志成城 共抗疫情</div>
-    <div class="validate">
-      <ValidateScroll></ValidateScroll>
-    </div>
-    <div class="info">
-      <div style="padding: 10px">
-        <div class="info-title">个人信息码</div>
-        <div class="info-name">
-          <div>姓名</div>
-          <div class="info-name-content">小明</div>
-        </div>
-        <div class="info-id">
-          <div>身份证号码</div>
-          <div class="info-id-content">130**********1234</div>
+  <div>
+    <div class="main">
+      <div class="title">社区疫情签到</div>
+      <div class="slogen">众志成城 共抗疫情</div>
+      <div class="validate">
+        <ValidateScroll></ValidateScroll>
+      </div>
+      <div class="info">
+        <div style="padding: 10px">
+          <div class="info-title">个人信息码</div>
+          <div class="info-name">
+            <div>姓名</div>
+            <div class="info-name-content">小明</div>
+          </div>
+          <div class="info-id">
+            <div>身份证号码</div>
+            <div class="info-id-content">130**********1234</div>
+          </div>
         </div>
       </div>
-    </div>
 
-    <div class="qr">
-      <div class="qr-date">{{curDate ? curDate : '日期'}}</div>
-      <div class="qr-qr"></div>
-      <div class="qr-sign">
-        是否签到:
-        <span class="qr-status">是</span>
+      <div class="qr">
+        <div class="qr-date">{{curDate ? curDate : '日期'}}</div>
+        <div class="qr-qr"></div>
+        <div class="qr-sign">
+          是否签到:
+          <span class="qr-status">是</span>
+        </div>
       </div>
-    </div>
-    <div class="btn-group">
-      <Button color="#43afe6" class="btn-top">查看本人签到信息</Button>
-      <Button class="btn-bottom">去打卡</Button>
+      <div class="btn-group">
+        <Button color="#43afe6" class="btn-top">查看本人签到信息</Button>
+        <Button class="btn-bottom" @click="sign">去打卡</Button>
+      </div>
     </div>
   </div>
 </template>
 
 <script>
 import { Button } from "vant";
-import ValidateScroll from "./ValidateScroll.vue";
+import ValidateScroll from "../components/ValidateScroll.vue";
 export default {
   name: "Entry",
   data() {
     return {
       curDate: "",
+      InterId: 0,
     };
   },
   methods: {
+    sign() {
+      this.$router.push("/sign");
+    },
     /**
      * 生成日期
      */
@@ -57,9 +63,13 @@ export default {
   },
   created() {
     this.generateDate();
-    setInterval(() => {
+    this.InterId = setInterval(() => {
       this.generateDate();
     }, 1000);
+  },
+  unmounted() {
+    console.log("unmounted");
+    clearInterval(this.InterId);
   },
   components: {
     Button,

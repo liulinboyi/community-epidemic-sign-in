@@ -1,24 +1,8 @@
-# sign
+# 社区疫情签到
 
-## Project setup
-```
-npm install
-```
+## 学期末项目
 
-### Compiles and hot-reloads for development
-```
-npm run serve
-```
+![](./images/社区疫情签到.gif)
 
-### Compiles and minifies for production
-```
-npm run build
-```
-
-### Lints and fixes files
-```
-npm run lint
-```
-
-### Customize configuration
-See [Configuration Reference](https://cli.vuejs.org/config/).
+### 前端:Vue3.0
+### 后端:SSM
