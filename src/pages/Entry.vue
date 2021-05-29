@@ -39,17 +39,37 @@
 <script>
 import { Button } from "vant";
 import ValidateScroll from "../components/ValidateScroll.vue";
+import { emitter } from "../utils/eventHub.js";
 export default {
   name: "Entry",
   data() {
     return {
       curDate: "",
       InterId: 0,
+      childPage: null,
     };
   },
   methods: {
+    emits() {
+      console.log(emitter);
+      emitter.emit("sign", { msg: "子页面已经关闭" });
+    },
     sign() {
-      this.$router.push("/sign");
+      let routes = this.$router.resolve({
+        name: "sign",
+        // params: {},
+      });
+      console.log(routes);
+      this.childPage = window.open(routes.href, "_blank");
+      let timeId = setInterval(() => {
+        console.log(this.childPage, "childPage");
+        if (this.childPage.closed) {
+          console.log("子页面已关闭");
+          this.emits();
+          clearInterval(timeId);
+        }
+      }, 1000);
+      // this.$router.push("/sign");
     },
     /**
      * 生成日期
@@ -66,6 +86,10 @@ export default {
     this.InterId = setInterval(() => {
       this.generateDate();
     }, 1000);
+    console.log(emitter);
+    emitter.on("sign", (e) => {
+      console.log("sign", e);
+    });
   },
   unmounted() {
     console.log("unmounted");

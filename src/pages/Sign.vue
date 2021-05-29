@@ -18,7 +18,7 @@
         <div class="basic-addresss">
           <div>当前所在地址</div>
           <div style="display: flex;align-items: center;">
-            <van-field ref="basicInput" style="flex: 1;" class="basic-input" v-model="location" />
+            <van-field :border="false" ref="basicInput" style="flex: 1;" class="basic-input" v-model="location" />
             <div @click="basicFocus" style="color: #1989fa;">填写</div>
           </div>
         </div>
