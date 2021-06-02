@@ -9,7 +9,15 @@ const routes = [
         name: 'sign',
         path: '/sign',
         component: () => import ('./pages/Sign.vue')
-    },
+    }, {
+        name: "sign-info",
+        path: "/sign-info",
+        component: () => import ('./pages/SignInfo.vue')
+    }, {
+        name: "account",
+        path: "/account",
+        component: () => import ('./pages/Account.vue')
+    }
 ]
 
 export const router = createRouter({history: createWebHashHistory(), routes})

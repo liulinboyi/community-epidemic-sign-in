@@ -1,36 +1,22 @@
 <template>
-  <div>
+  <div class="sign-info">
     <div class="basic">
-      <div class="basic-title">基本信息</div>
-      <div style="padding: 10px 20px;">
-        <div class="basic-name">
-          <div>姓名</div>
-          <div>小明</div>
-        </div>
-        <div class="basic-id">
-          <div>证件号码</div>
-          <div>130**********1234</div>
-        </div>
-        <div class="basic-phone">
-          <div>联系电话</div>
-          <div>12345678900</div>
-        </div>
-        <div class="basic-addresss">
-          <div>当前所在地址</div>
-          <div style="display: flex;align-items: center;">
-            <van-field
-              :border="false"
-              ref="basicInput"
-              style="flex: 1;"
-              class="basic-input"
-              v-model="location"
-            />
-            <div @click="basicFocus" style="color: #1989fa;">填写</div>
+      <div class="basic-title">健康打卡信息</div>
+      <div class="main">
+        <div class="basic-out">
+          <div class="basic-sign" :key="item.index" v-for="item in dates">
+            <div>{{item.date}}</div>
+            <div>未打卡</div>
           </div>
+        </div>
+        <div class="zhu">注：仅显示近14天的打卡记录</div>
+        <div class="basic-submit">
+          <div class="slogen">坚持每天健康打卡，助力疫情防控工作</div>
+          <van-button @click="sign" type="primary" block>去打卡</van-button>
         </div>
       </div>
     </div>
-    <div class="basic">
+    <!-- <div class="basic">
       <div class="basic-title">近期情况</div>
       <div style="padding: 10px 20px;">
         <div class="basic-recent">
@@ -79,7 +65,7 @@
           <van-button :disabled="!ischecked" type="primary" block>提交</van-button>
         </div>
       </div>
-    </div>
+    </div>-->
   </div>
 </template>
 <script>
@@ -99,7 +85,22 @@ export default {
       manychecked: [],
       temperature: "",
       ischecked: false,
+      dates: [],
     };
+  },
+  created() {
+    let date = new Date();
+    let oneday = 24 * 60 * 60 * 1000;
+    let count = 14;
+    for (let i = 0; i < count; i++) {
+      let time = new Date(date.valueOf() - oneday * i);
+      let d = `${time.getFullYear()}-${
+        time.getMonth() + 1 < 10
+          ? `0${time.getMonth() + 1}`
+          : time.getMonth() + 1
+      }-${time.getDate() < 10 ? `0${time.getDate()}` : time.getDate()}`;
+      this.dates.push({ date: d, index: i });
+    }
   },
   watch: {
     location(oldVal, newVal) {
@@ -109,6 +110,9 @@ export default {
   methods: {
     basicFocus() {
       this.$refs.basicInput.focus();
+    },
+    sign() {
+      this.$router.push("/sign");
     },
   },
   components: {
@@ -124,91 +128,44 @@ export default {
 <style scope>
 .basic {
 }
-.basic-submit {
+.sign-info .main {
+  padding: 0 20px;
+}
+.sign-info .basic-out {
+  border-bottom: 1px solid rgb(190, 190, 190);
+  padding: 10px 0;
+}
+.sign-info .slogen {
+  text-align: center;
+  color: #999;
+  padding-bottom: 15px;
+  font-size: 10px;
+}
+.sign-info .zhu {
+  color: #999;
+  padding-top: 15px;
+  font-size: 10px;
+}
+.sign-info .basic-submit {
   padding: 25px 0;
   font-size: 16px;
 }
-.basic-confirm {
-  padding: 20px 0;
-  border-bottom: 1px solid rgb(190, 190, 190);
-  font-size: 16px;
-}
-.basic-temperature {
-  font-size: 16px;
-  /* color: #999; */
-  border-bottom: 1px solid rgb(190, 190, 190);
-  padding: 10px 0;
-}
-.basic-temperature > div {
-  line-height: 25px;
-}
-.basic-status .van-checkbox-group {
-  padding: 10px 0;
-}
-.basic-status .van-checkbox {
-  padding: 15px 0;
-  border-bottom: 1px solid rgb(190, 190, 190);
-}
-.basic-status {
-  font-size: 16px;
-}
-.basic-recent {
-  font-size: 16px;
-}
-.basic-recent .van-radio-group {
-  padding: 10px 0;
-}
-/* .basic-recent .van-radio:not(:last-of-type) {
-  padding: 7px 0;
-} */
-.basic-recent .van-radio {
-  padding: 15px 0;
-  border-bottom: 1px solid rgb(190, 190, 190);
-}
-.basic-title {
+.sign-info .basic-title {
   background: rgb(190, 190, 190);
   height: 50px;
   line-height: 50px;
   padding-left: 20px;
   font-size: 16px;
 }
-.basic-name {
+.sign-info .basic-sign {
   font-size: 16px;
   color: #999;
-  border-bottom: 1px solid rgb(190, 190, 190);
-  padding-bottom: 10px;
+  /* border-bottom: 1px solid rgb(190, 190, 190); */
+  padding-bottom: 5px;
+  display: flex;
+  justify-content: space-between;
 }
-.basic-name > div {
+.sign-info .basic-sign > div {
   line-height: 25px;
-}
-.basic-id {
-  font-size: 16px;
-  color: #999;
-  border-bottom: 1px solid rgb(190, 190, 190);
-  padding: 10px 0;
-}
-.basic-id > div {
-  line-height: 25px;
-}
-.basic-phone {
-  font-size: 16px;
-  color: #999;
-  border-bottom: 1px solid rgb(190, 190, 190);
-  padding: 10px 0;
-}
-.basic-phone > div {
-  line-height: 25px;
-}
-.basic-addresss {
-  font-size: 16px;
-  /* color: #999; */
-  border-bottom: 1px solid rgb(190, 190, 190);
-  padding: 10px 0;
-}
-.basic-addresss > div {
-  line-height: 25px;
-}
-.basic-input {
-  padding: 0;
 }
 </style>

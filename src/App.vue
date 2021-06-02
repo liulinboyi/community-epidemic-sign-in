@@ -4,13 +4,22 @@
       <component :is="Component" />
     </transition>
   </router-view>
+
+  <van-tabbar route>
+    <van-tabbar-item replace to="/" icon="home-o">首页</van-tabbar-item>
+    <van-tabbar-item replace to="/account" icon="user-circle-o">我的</van-tabbar-item>
+  </van-tabbar>
   <!-- <router-view></router-view> -->
 </template>
 
 <script>
+import { Tabbar, TabbarItem } from "vant";
 export default {
   name: "App",
-  components: {},
+  components: {
+    [Tabbar.name]: Tabbar,
+    [TabbarItem.name]: TabbarItem,
+  },
 };
 </script>
 
@@ -19,6 +28,9 @@ export default {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
+}
+#app {
+  margin-bottom: 50px;
 }
 .fade-enter-active,
 .fade-leave-active {

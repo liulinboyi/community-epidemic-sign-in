@@ -29,7 +29,7 @@
         </div>
       </div>
       <div class="btn-group">
-        <Button color="#43afe6" class="btn-top">查看本人签到信息</Button>
+        <Button color="#43afe6" @click="signInfo" class="btn-top">查看本人签到信息</Button>
         <Button class="btn-bottom" @click="sign">去打卡</Button>
       </div>
     </div>
@@ -55,6 +55,7 @@ export default {
       emitter.emit("sign", { msg: "子页面已经关闭" });
     },
     sign() {
+      /**
       let routes = this.$router.resolve({
         name: "sign",
         // params: {},
@@ -69,23 +70,39 @@ export default {
           clearInterval(timeId);
         }
       }, 1000);
-      // this.$router.push("/sign");
+      */
+      this.$router.push("/sign");
+    },
+    signInfo() {
+      this.$router.push("/sign-info");
     },
     /**
      * 生成日期
      */
     generateDate() {
       let date = new Date();
-      this.curDate = `${date.getFullYear()}-${
-        date.getMonth() + 1
-      }-${date.getDate()} ${date.getHours()}:${date.getMinutes()}:${date.getSeconds()}`;
+      let month = date.getMonth() + 1;
+      month = month < 10 ? `0${month}` : month;
+      let day = date.getDate();
+      day = day < 10 ? `0${day}` : day;
+      let hour = date.getHours();
+      hour = date.getHours() < 10 ? `0${hour}` : hour;
+      let minute = date.getMinutes();
+      minute = minute < 10 ? `0${minute}` : minute;
+      let second = date.getSeconds();
+      second = second < 10 ? `0${second}` : second;
+      this.curDate = `${date.getFullYear()}-${month}-${day} ${hour}:${minute}:${second}`;
     },
   },
   created() {
     this.generateDate();
-    this.InterId = setInterval(() => {
-      this.generateDate();
-    }, 1000);
+    let raf = () => {
+      this.InterId = requestAnimationFrame(() => {
+        this.generateDate();
+        raf();
+      });
+    };
+    raf();
     console.log(emitter);
     emitter.on("sign", (e) => {
       console.log("sign", e);
@@ -93,7 +110,8 @@ export default {
   },
   unmounted() {
     console.log("unmounted");
-    clearInterval(this.InterId);
+    // clearInterval(this.InterId);
+    cancelAnimationFrame(this.InterId);
   },
   components: {
     Button,
