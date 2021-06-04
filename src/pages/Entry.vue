@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class="entry">
     <div class="main">
       <div class="title">社区疫情签到</div>
       <div class="slogen">众志成城 共抗疫情</div>
@@ -37,7 +37,7 @@
 </template>
 
 <script>
-import { Button } from "vant";
+import { Button, Dialog } from "vant";
 import ValidateScroll from "../components/ValidateScroll.vue";
 import { emitter } from "../utils/eventHub.js";
 export default {
@@ -50,6 +50,9 @@ export default {
     };
   },
   methods: {
+    sleep(time) {
+      return new Promise((resolve) => setTimeout(resolve, time));
+    },
     emits() {
       console.log(emitter);
       emitter.emit("sign", { msg: "子页面已经关闭" });
@@ -94,7 +97,10 @@ export default {
       this.curDate = `${date.getFullYear()}-${month}-${day} ${hour}:${minute}:${second}`;
     },
   },
-  created() {
+  async created() {
+    // await this.sleep(2000); // 不起作用
+    console.log("Entry");
+    console.log(this.$datas);
     this.generateDate();
     let raf = () => {
       this.InterId = requestAnimationFrame(() => {
@@ -108,6 +114,18 @@ export default {
       console.log("sign", e);
     });
   },
+  beforeMount() {
+    if (!this.$data.userInfo) {
+      Dialog.alert({
+        title: "提示",
+        message: "请登录",
+        theme: "round-button",
+      }).then(() => {
+        // this.$router.push("/account");
+      });
+    }
+  },
+  mounted() {},
   unmounted() {
     console.log("unmounted");
     // clearInterval(this.InterId);
@@ -125,6 +143,9 @@ export default {
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
+.entry {
+  margin-bottom: 50px;
+}
 .validate {
   margin: 20px 20px 0 20px;
 }

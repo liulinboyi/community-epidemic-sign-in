@@ -1,24 +1,14 @@
 <template>
-  <router-view v-slot="{ Component }">
-    <transition name="fade" mode="out-in">
-      <component :is="Component" />
-    </transition>
-  </router-view>
-
-  <van-tabbar route>
-    <van-tabbar-item replace to="/" icon="home-o">首页</van-tabbar-item>
-    <van-tabbar-item replace to="/account" icon="user-circle-o">我的</van-tabbar-item>
-  </van-tabbar>
-  <!-- <router-view></router-view> -->
+  <!-- 主router-view -->
+  <router-view></router-view>
 </template>
 
 <script>
-import { Tabbar, TabbarItem } from "vant";
+// import Home from "./pages/Home.vue";
 export default {
   name: "App",
   components: {
-    [Tabbar.name]: Tabbar,
-    [TabbarItem.name]: TabbarItem,
+    // Home: Home,
   },
 };
 </script>
@@ -30,7 +20,7 @@ export default {
   box-sizing: border-box;
 }
 #app {
-  margin-bottom: 50px;
+  /* margin-bottom: 50px; */
 }
 .fade-enter-active,
 .fade-leave-active {

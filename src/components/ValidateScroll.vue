@@ -43,12 +43,14 @@
 <script>
 export default {
   name: "ValidateScroll",
-  created() {},
+  created() {
+    console.log("ValidateScroll");
+  },
   mounted() {
     let out = this.$refs.out;
     //
-    console.log(process.env);
-    console.log(process.env.VUE_APP_ViewportWidth);
+    // console.log(process.env);
+    // console.log(process.env.VUE_APP_ViewportWidth);
     let basic = process.env.VUE_APP_ViewportWidth;
     let vwBasic = 100 / Number(basic); // 1px 代表多少vw
     let start = -vwBasic * 30 * 10; // 长度为validateInner的宽度的倍数即可使动画衔接平稳
