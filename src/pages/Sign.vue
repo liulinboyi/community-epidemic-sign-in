@@ -1,19 +1,19 @@
 <template>
-  <div>
+  <div ref="scrollView">
     <div class="basic">
       <div class="basic-title">基本信息</div>
       <div style="padding: 10px 20px;">
         <div class="basic-name">
           <div>姓名</div>
-          <div>小明</div>
+          <div>{{nickName}}</div>
         </div>
         <div class="basic-id">
           <div>证件号码</div>
-          <div>130**********1234</div>
+          <div>{{idcard}}</div>
         </div>
         <div class="basic-phone">
           <div>联系电话</div>
-          <div>12345678900</div>
+          <div>{{phone}}</div>
         </div>
         <div class="basic-addresss">
           <div>当前所在地址</div>
@@ -37,9 +37,9 @@
           <div>近14天内您是否接触新冠肺炎确诊或疑似患者？</div>
           <div>
             <van-radio-group v-model="checked">
-              <van-radio name="是">是</van-radio>
-              <van-radio name="否">否</van-radio>
-              <van-radio name="不确定">不确定</van-radio>
+              <van-radio name="1">是</van-radio>
+              <van-radio name="0">否</van-radio>
+              <van-radio name="2">不确定</van-radio>
             </van-radio-group>
           </div>
         </div>
@@ -47,13 +47,13 @@
           <div>当前状况（可多选）</div>
           <div>
             <van-checkbox-group v-model="manychecked">
-              <van-checkbox shape="square" name="没有出现症状">没有出现症状</van-checkbox>
-              <van-checkbox shape="square" name="感冒症状：乏力、咳嗽、发烧、肌肉痛、头痛">感冒症状：乏力、咳嗽、发烧、肌肉痛、头痛</van-checkbox>
-              <van-checkbox shape="square" name="喘憋、呼吸急促">喘憋、呼吸急促</van-checkbox>
-              <van-checkbox shape="square" name="恶心呕吐、腹泻">恶心呕吐、腹泻</van-checkbox>
-              <van-checkbox shape="square" name="心慌、胸闷">心慌、胸闷</van-checkbox>
-              <van-checkbox shape="square" name="结膜炎（红眼病样表现：眼睛涩、红、分泌物）">结膜炎（红眼病样表现：眼睛涩、红、分泌物）</van-checkbox>
-              <van-checkbox shape="square" name="其他症状">其他症状</van-checkbox>
+              <van-checkbox shape="square" name="0">没有出现症状</van-checkbox>
+              <van-checkbox shape="square" name="1">感冒症状：乏力、咳嗽、发烧、肌肉痛、头痛</van-checkbox>
+              <van-checkbox shape="square" name="2">喘憋、呼吸急促</van-checkbox>
+              <van-checkbox shape="square" name="3">恶心呕吐、腹泻</van-checkbox>
+              <van-checkbox shape="square" name="4">心慌、胸闷</van-checkbox>
+              <van-checkbox shape="square" name="5">结膜炎（红眼病样表现：眼睛涩、红、分泌物）</van-checkbox>
+              <van-checkbox shape="square" name="6">其他症状</van-checkbox>
             </van-checkbox-group>
           </div>
         </div>
@@ -76,7 +76,7 @@
           <van-checkbox v-model="ischecked" shape="square">上述信息是我本人填写，本人对信息内容的真实性和完整性负责。</van-checkbox>
         </div>
         <div class="basic-submit">
-          <van-button :disabled="!ischecked" type="primary" block>提交</van-button>
+          <van-button @click="uploadSign" :disabled="!ischecked" type="primary" block>提交</van-button>
         </div>
       </div>
     </div>
@@ -90,16 +90,54 @@ import {
   Checkbox,
   CheckboxGroup,
   Button,
+  Dialog,
 } from "vant";
+import { post } from "../utils/fetch.js";
 export default {
+  name: "Sign",
   data() {
     return {
-      location: "河北省石家市桥西区",
+      location: "",
       checked: "",
       manychecked: [],
       temperature: "",
       ischecked: false,
+      curRouter: this.$route,
+      state: this.$datas.state,
     };
+  },
+  computed: {
+    nickName() {
+      return this.state.userInfo && this.state.userInfo.nickname;
+    },
+    idcard() {
+      return (
+        this.state.userInfo &&
+        `${this.state.userInfo.idcard.substring(
+          0,
+          4
+        )}*********${this.state.userInfo.idcard.substring(
+          13,
+          this.state.userInfo.idcard.length
+        )}`
+      );
+    },
+    phone() {
+      return this.state.userInfo && this.state.userInfo.telephone;
+    },
+  },
+  deactivated() {
+    console.log("deactivated");
+    // this.curRouter.top = this.$refs.scrollView.getClientRects()[0].top;
+    // console.log(this.curRouter.top);
+    // console.log(this.curRouter);
+    // console.log(this.$refs.scrollView);
+    this.$datas.setTop(-this.$refs.scrollView.getBoundingClientRect().top);
+    console.log(this.$datas);
+  },
+  activated() {
+    console.log("activated");
+    window.scrollTo(0, this.$datas.state.top);
   },
   watch: {
     location(oldVal, newVal) {
@@ -107,6 +145,56 @@ export default {
     },
   },
   methods: {
+    async uploadSign() {
+      console.log("上传签到");
+      if (
+        this.location &&
+        this.checked &&
+        this.manychecked.length > 0 &&
+        this.temperature
+      ) {
+        let userInfo = localStorage.getItem("userInfo");
+        if (userInfo) {
+          userInfo = JSON.parse(userInfo);
+          let upload = {
+            address: this.location,
+            contactTag: this.checked,
+            statusTag: this.manychecked.join(","),
+            temperature: this.temperature,
+            userId: userInfo.id,
+            time: new Date().toISOString(),
+          };
+          console.log(upload);
+          try {
+            let res = await post({
+              path: "sign",
+              data: upload,
+            });
+            console.log(res);
+            Dialog.alert({
+              title: "提示",
+              message: res.msg,
+              theme: "round-button",
+            }).then(() => {
+              this.location = "";
+              this.checked = "";
+              this.manychecked = [];
+              this.temperature = "";
+              this.ischecked = false;
+              this.$router.replace("/sign-info");
+            });
+          } catch (error) {
+            console.log(error);
+          }
+        }
+      } else {
+        Dialog({
+          title: "提示",
+          message: "请填写完整！",
+          theme: "round-button",
+        });
+      }
+    },
     basicFocus() {
       this.$refs.basicInput.focus();
     },

@@ -43,9 +43,6 @@
 <script>
 export default {
   name: "ValidateScroll",
-  created() {
-    console.log("ValidateScroll");
-  },
   mounted() {
     let out = this.$refs.out;
     //

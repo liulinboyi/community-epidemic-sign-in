@@ -11,11 +11,11 @@
           <div class="info-title">个人信息码</div>
           <div class="info-name">
             <div>姓名</div>
-            <div class="info-name-content">小明</div>
+            <div class="info-name-content">{{nickName}}</div>
           </div>
           <div class="info-id">
             <div>身份证号码</div>
-            <div class="info-id-content">130**********1234</div>
+            <div class="info-id-content">{{idcard}}</div>
           </div>
         </div>
       </div>
@@ -40,6 +40,7 @@
 import { Button, Dialog } from "vant";
 import ValidateScroll from "../components/ValidateScroll.vue";
 import { emitter } from "../utils/eventHub.js";
+import { post } from "../utils/fetch.js";
 export default {
   name: "Entry",
   data() {
@@ -47,7 +48,25 @@ export default {
       curDate: "",
       InterId: 0,
       childPage: null,
+      state: this.$datas.state,
     };
+  },
+  computed: {
+    nickName() {
+      return this.state.userInfo && this.state.userInfo.nickname;
+    },
+    idcard() {
+      return (
+        this.state.userInfo &&
+        `${this.state.userInfo.idcard.substring(
+          0,
+          4
+        )}*********${this.state.userInfo.idcard.substring(
+          13,
+          this.state.userInfo.idcard.length
+        )}`
+      );
+    },
   },
   methods: {
     sleep(time) {
@@ -97,7 +116,7 @@ export default {
       this.curDate = `${date.getFullYear()}-${month}-${day} ${hour}:${minute}:${second}`;
     },
   },
-  async created() {
+  async beforeMount() {
     // await this.sleep(2000); // 不起作用
     console.log("Entry");
     console.log(this.$datas);
@@ -113,15 +132,37 @@ export default {
     emitter.on("sign", (e) => {
       console.log("sign", e);
     });
-  },
-  beforeMount() {
-    if (!this.$data.userInfo) {
+
+    // await this.sleep(2000)
+    // 请求用户数据
+    let userInfo = localStorage.getItem("userInfo");
+    if (userInfo) {
+      userInfo = JSON.parse(userInfo);
+      let res = await post({
+        path: `findUserById?id=${userInfo.id}`,
+        data: {},
+      });
+      if (res.code === "404") {
+        Dialog.alert({
+          title: "提示",
+          message: "请重新登录",
+          theme: "round-button",
+        }).then(() => {
+          localStorage.removeItem("userInfo");
+          // this.$router.push("/account");
+        });
+      } else if (res.code === "200") {
+        this.$datas.setUserInfoAction(res.data);
+        console.log(this.$datas);
+      }
+    }
+    if (!this.$datas.state.userInfo) {
       Dialog.alert({
         title: "提示",
         message: "请登录",
         theme: "round-button",
       }).then(() => {
-        // this.$router.push("/account");
+        this.$router.push("/account");
       });
     }
   },

@@ -6,7 +6,7 @@
         <div class="basic-out">
           <div class="basic-sign" :key="item.index" v-for="item in dates">
             <div>{{item.date}}</div>
-            <div>未打卡</div>
+            <div>{{item.isSign ? "已签到" : "未打卡"}}</div>
           </div>
         </div>
         <div class="zhu">注：仅显示近14天的打卡记录</div>
@@ -76,7 +76,9 @@ import {
   Checkbox,
   CheckboxGroup,
   Button,
+  Dialog,
 } from "vant";
+import { get } from "../utils/fetch.js";
 export default {
   data() {
     return {
@@ -88,7 +90,7 @@ export default {
       dates: [],
     };
   },
-  created() {
+  async beforeMount() {
     let date = new Date();
     let oneday = 24 * 60 * 60 * 1000;
     let count = 14;
@@ -100,6 +102,55 @@ export default {
           : time.getMonth() + 1
       }-${time.getDate() < 10 ? `0${time.getDate()}` : time.getDate()}`;
       this.dates.push({ date: d, index: i });
+    }
+    console.log(this.dates, "this.dates");
+    let userInfo = localStorage.getItem("userInfo");
+    if (userInfo) {
+      userInfo = JSON.parse(userInfo);
+      let res = await get({
+        path: `findUserSign?id=${userInfo.id}`,
+      });
+      if (res.code === "404") {
+        Dialog.alert({
+          title: "提示",
+          message: "请重新登录",
+          theme: "round-button",
+        }).then(() => {
+          localStorage.removeItem("userInfo");
+          this.$router.push("/account");
+        });
+      } else if (res.code === "200") {
+        this.$datas.setUserInfoAction(res.data);
+        let dates = res.data.signs;
+        // let signDate = [];
+        // for (let i = 0; i < this.dates.length; i++) {
+        //   signDate.push({
+        //     index: i,
+        //     date: new Date(this.dates[i].date).format("yyyy-MM-dd"),
+        //   });
+        // }
+        let signDate = {};
+        for (let i = 0; i < this.dates.length; i++) {
+          signDate[new Date(this.dates[i].date).format("yyyy-MM-dd")] = i;
+        }
+
+        console.log(signDate);
+        if (dates) {
+          for (let i = 0; i < dates.length; i++) {
+            // let res = signDate.filter((ele) => {
+            //   if (ele.date === new Date(dates[i].time).format("yyyy-MM-dd")) {
+            //     return true;
+            //   }
+            // });
+            // this.dates[res[0].index].isSign = true;
+
+            let index = signDate[new Date(dates[i].time).format("yyyy-MM-dd")];
+            this.dates[index].isSign = true;
+          }
+        }
+        console.log(this.dates);
+        console.log(this.$datas);
+      }
     }
   },
   watch: {

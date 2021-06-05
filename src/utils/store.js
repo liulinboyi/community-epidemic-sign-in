@@ -1,10 +1,18 @@
 import {reactive} from 'vue'
-const store = {
+export const store = {
     debug: true,
 
     state: reactive(
-        {userInfo: null}
+        {userInfo: null, top: 0}
     ),
+
+    setTop(newValue) {
+        if (this.debug) {
+            console.log('setuserInfoAction triggered with', newValue)
+        }
+
+        this.state.top = newValue
+    },
 
     setUserInfoAction(newValue) {
         if (this.debug) {

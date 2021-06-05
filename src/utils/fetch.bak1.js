@@ -1,8 +1,6 @@
 import {app} from '../main.js'
-// const baseUrl = "http://localhost/"
+const baseUrl = "http://localhost/"
 // const baseUrl = "http://localhost:8080/"
-const baseUrl = "http://192.168.31.102/"
-
 
 function isPromise(value) {
     return value && Object.prototype.toString.call(value) === "[object Promise]";
@@ -63,27 +61,20 @@ export async function post(options) {
             credentials: 'include'
         })
         if (! res.ok) {
-            // try catch 会捕获await Promise.reject
-            // await Promise.reject(res.json())会捕获
-            // Promise.reject(await res.json())这里不会捕获
-            return await Promise.reject(await res.json())
+            return await Promise.reject(res.json())
         }
         console.log(res)
         return res.json(); // res.json()是Promise
     } catch (e) {
-        // console.log(e)
-        // if (isPromise(e)) {
-        //     let res = await e;
-        //     console.log(res)
-        //     app.config.globalProperties.$dialog.alert({title: '提示', message: res.msg, theme: 'round-button'});
-        //     return Promise.reject(res)
-        // }
         console.log(e)
-        app.config.globalProperties.$dialog.alert({
-            title: '提示',
-            message: e.msg ? e.msg : '出错了！请稍后再试！',
-            theme: 'round-button'
-        });
-        return Promise.reject(e.data ? e.data : e)
+        if (isPromise(e)) {
+            let res = await e;
+            console.log(res)
+            app.config.globalProperties.$dialog.alert({title: '提示', message: res.msg, theme: 'round-button'});
+            return Promise.reject(res)
+        }
+        console.log(e)
+        app.config.globalProperties.$dialog.alert({title: '提示', message: '出错了！请稍后再试！', theme: 'round-button'});
+        return e.data
     }
 }

@@ -1,14 +1,22 @@
 <template>
   <!-- 主router-view -->
-  <router-view></router-view>
+  <router-view v-slot="{ Component }">
+    <transition name="fade" mode="out-in">
+      <keep-alive include="Sign">
+        <component :is="Component" />
+      </keep-alive>
+    </transition>
+  </router-view>
 </template>
 
 <script>
 // import Home from "./pages/Home.vue";
+import Sign from "./pages/Sign.vue";
 export default {
   name: "App",
   components: {
     // Home: Home,
+    Sign: Sign,
   },
 };
 </script>
