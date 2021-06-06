@@ -94,7 +94,7 @@ export default {
 }
 
 .validateInner:nth-child(2n + 1) {
-  background: green;
+  background: #e4faad;
 }
 
 .validateInner:nth-child(2n) {

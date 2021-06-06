@@ -1,7 +1,7 @@
 import {app} from '../main.js'
 // const baseUrl = "http://localhost/"
-// const baseUrl = "http://localhost:8080/"
-const baseUrl = "http://192.168.31.102/"
+const baseUrl = "http://localhost:8080/"
+// const baseUrl = "http://192.168.31.102/"
 
 
 function isPromise(value) {

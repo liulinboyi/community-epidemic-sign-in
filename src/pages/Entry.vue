@@ -1,7 +1,7 @@
 <template>
   <div class="entry">
     <div class="main">
-      <div class="title">社区疫情签到</div>
+      <div class="title">公司疫情签到</div>
       <div class="slogen">众志成城 共抗疫情</div>
       <div class="validate">
         <ValidateScroll></ValidateScroll>
@@ -196,7 +196,8 @@ export default {
 }
 .main {
   min-height: 100vh;
-  background: linear-gradient(rgb(206 237 245), #fff);
+  /* background: linear-gradient(rgb(206 237 245), #fff); */
+  background: linear-gradient(rgba(227 249 170), #fff);
 }
 .title {
   text-align: center;

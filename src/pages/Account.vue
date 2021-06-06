@@ -4,7 +4,7 @@
       <div class="account">
         <div style="width: 100%;">
           <div>
-            <div class="account-title">社区疫情</div>
+            <div class="account-title">公司疫情</div>
             <div class="login-title">{{status}}</div>
             <van-form @submit="onSubmit" v-if="status === STATUS.register">
               <van-field
@@ -359,10 +359,16 @@ export default {
 .user-name {
   padding-left: 10px;
   font-size: 20px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  flex: 1;
 }
 .user-phone {
   padding-left: 10px;
   font-size: 20px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  flex: 1;
 }
 
 .account {
