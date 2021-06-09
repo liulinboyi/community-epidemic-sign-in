@@ -159,7 +159,7 @@ export default {
       } else if (res.code === "200") {
         this.isLogin = true;
         this.$datas.setUserInfoAction(res.data);
-        console.log(this.$datas);
+        // console.log(this.$datas);
       }
     } else {
       this.isLogin = false;
@@ -220,8 +220,8 @@ export default {
             password: this.password,
           },
         });
-        console.log(res);
-        console.log(this.$datas);
+        // console.log(res);
+        // console.log(this.$datas);
         toast.clear();
         if (res.code === "404") {
           Dialog.alert({
@@ -273,7 +273,7 @@ export default {
         this.isLogin = true;
         this.show = false;
         toast.clear();
-        console.log(res);
+        // console.log(res);
       } catch (error) {
         toast.clear();
         console.log(error);
@@ -355,6 +355,8 @@ export default {
   height: 50px;
   border-radius: 50%;
   background: #666;
+  background: url(../assets/头像.png);
+  background-size: cover;
 }
 .user-name {
   padding-left: 10px;
@@ -362,6 +364,7 @@ export default {
   overflow: hidden;
   text-overflow: ellipsis;
   flex: 1;
+  text-align: center;
 }
 .user-phone {
   padding-left: 10px;

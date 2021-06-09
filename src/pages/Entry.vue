@@ -10,7 +10,7 @@
         <div style="padding: 10px">
           <div class="info-title">个人信息码</div>
           <div class="info-name">
-            <div>姓名</div>
+            <div class="info-name-title">姓名</div>
             <div class="info-name-content">{{nickName}}</div>
           </div>
           <div class="info-id">
@@ -24,8 +24,8 @@
         <div class="qr-date">{{curDate ? curDate : '日期'}}</div>
         <div class="qr-qr"></div>
         <div class="qr-sign">
-          是否签到:
-          <span class="qr-status">是</span>
+          今日是否签到:
+          <span class="qr-status">{{isSign ? "是" : "否"}}</span>
         </div>
       </div>
       <div class="btn-group">
@@ -40,7 +40,7 @@
 import { Button, Dialog } from "vant";
 import ValidateScroll from "../components/ValidateScroll.vue";
 import { emitter } from "../utils/eventHub.js";
-import { post } from "../utils/fetch.js";
+import { post, get } from "../utils/fetch.js";
 export default {
   name: "Entry",
   data() {
@@ -49,6 +49,7 @@ export default {
       InterId: 0,
       childPage: null,
       state: this.$datas.state,
+      isSign: false,
     };
   },
   computed: {
@@ -73,7 +74,7 @@ export default {
       return new Promise((resolve) => setTimeout(resolve, time));
     },
     emits() {
-      console.log(emitter);
+      // console.log(emitter);
       emitter.emit("sign", { msg: "子页面已经关闭" });
     },
     sign() {
@@ -118,8 +119,8 @@ export default {
   },
   async beforeMount() {
     // await this.sleep(2000); // 不起作用
-    console.log("Entry");
-    console.log(this.$datas);
+    // console.log("Entry");
+    // console.log(this.$datas);
     this.generateDate();
     let raf = () => {
       this.InterId = requestAnimationFrame(() => {
@@ -128,42 +129,69 @@ export default {
       });
     };
     raf();
-    console.log(emitter);
+    // console.log(emitter);
     emitter.on("sign", (e) => {
       console.log("sign", e);
     });
 
     // await this.sleep(2000)
     // 请求用户数据
-    let userInfo = localStorage.getItem("userInfo");
-    if (userInfo) {
-      userInfo = JSON.parse(userInfo);
-      let res = await post({
-        path: `findUserById?id=${userInfo.id}`,
-        data: {},
-      });
-      if (res.code === "404") {
+    try {
+      let userInfo = localStorage.getItem("userInfo");
+      if (userInfo) {
+        userInfo = JSON.parse(userInfo);
+        let res = await post({
+          path: `findUserById?id=${userInfo.id}`,
+          data: {},
+        });
+        if (res.code === "404") {
+          Dialog.alert({
+            title: "提示",
+            message: "请重新登录",
+            theme: "round-button",
+          }).then(() => {
+            localStorage.removeItem("userInfo");
+            // this.$router.push("/account");
+          });
+        } else if (res.code === "200") {
+          this.$datas.setUserInfoAction(res.data);
+          // console.log(this.$datas);
+        }
+
+        // 签到信息
+        let signInfo = await get({
+          path: `findUserSign?id=${userInfo.id}`,
+        });
+        if (signInfo.code === "404") {
+          Dialog.alert({
+            title: "提示",
+            message: "请重新登录",
+            theme: "round-button",
+          }).then(() => {
+            localStorage.removeItem("userInfo");
+            // this.$router.push("/account");
+          });
+        } else if (signInfo.code === "200") {
+          // console.log(signInfo.data);
+          let datas = signInfo.data;
+          if (datas.signs.length <= 0) return;
+          let date = new Date().format("yyyy-MM-dd");
+          if (date === new Date(datas.signs[0].time).format("yyyy-MM-dd")) {
+            this.isSign = true;
+          }
+        }
+      }
+      if (!this.$datas.state.userInfo) {
         Dialog.alert({
           title: "提示",
-          message: "请重新登录",
+          message: "请登录",
           theme: "round-button",
         }).then(() => {
-          localStorage.removeItem("userInfo");
-          // this.$router.push("/account");
+          this.$router.push("/account");
         });
-      } else if (res.code === "200") {
-        this.$datas.setUserInfoAction(res.data);
-        console.log(this.$datas);
       }
-    }
-    if (!this.$datas.state.userInfo) {
-      Dialog.alert({
-        title: "提示",
-        message: "请登录",
-        theme: "round-button",
-      }).then(() => {
-        this.$router.push("/account");
-      });
+    } catch (error) {
+      console.log(error);
     }
   },
   mounted() {},
@@ -229,8 +257,15 @@ export default {
   padding: 10px 0 10px 0;
   font-size: 15px;
 }
+.info-name-title {
+  margin-right: 30px;
+}
 .info-name-content {
   color: #999;
+  flex: 1;
+  word-break: break-all;
+  display: flex;
+  justify-content: flex-end;
 }
 .info-id {
   display: flex;

@@ -103,7 +103,7 @@ export default {
       }-${time.getDate() < 10 ? `0${time.getDate()}` : time.getDate()}`;
       this.dates.push({ date: d, index: i });
     }
-    console.log(this.dates, "this.dates");
+    // console.log(this.dates, "this.dates");
     let userInfo = localStorage.getItem("userInfo");
     if (userInfo) {
       userInfo = JSON.parse(userInfo);
@@ -134,7 +134,7 @@ export default {
           signDate[new Date(this.dates[i].date).format("yyyy-MM-dd")] = i;
         }
 
-        console.log(signDate);
+        // console.log(signDate);
         if (dates) {
           for (let i = 0; i < dates.length; i++) {
             // let res = signDate.filter((ele) => {
@@ -148,8 +148,8 @@ export default {
             this.dates[index].isSign = true;
           }
         }
-        console.log(this.dates);
-        console.log(this.$datas);
+        // console.log(this.dates);
+        // console.log(this.$datas);
       }
     }
   },

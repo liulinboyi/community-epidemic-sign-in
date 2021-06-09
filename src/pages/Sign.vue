@@ -127,16 +127,16 @@ export default {
     },
   },
   deactivated() {
-    console.log("deactivated");
+    // console.log("deactivated");
     // this.curRouter.top = this.$refs.scrollView.getClientRects()[0].top;
     // console.log(this.curRouter.top);
     // console.log(this.curRouter);
     // console.log(this.$refs.scrollView);
     this.$datas.setTop(-this.$refs.scrollView.getBoundingClientRect().top);
-    console.log(this.$datas);
+    // console.log(this.$datas);
   },
   activated() {
-    console.log("activated");
+    // console.log("activated");
     window.scrollTo(0, this.$datas.state.top);
   },
   watch: {
@@ -146,7 +146,7 @@ export default {
   },
   methods: {
     async uploadSign() {
-      console.log("上传签到");
+      // console.log("上传签到");
       if (
         this.location &&
         this.checked &&
@@ -164,13 +164,13 @@ export default {
             userId: userInfo.id,
             time: new Date().toISOString(),
           };
-          console.log(upload);
+          // console.log(upload);
           try {
             let res = await post({
               path: "sign",
               data: upload,
             });
-            console.log(res);
+            // console.log(res);
             Dialog.alert({
               title: "提示",
               message: res.msg,
@@ -268,6 +268,7 @@ export default {
 }
 .basic-name > div {
   line-height: 25px;
+  word-break: break-all;
 }
 .basic-id {
   font-size: 16px;
