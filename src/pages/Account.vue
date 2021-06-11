@@ -4,7 +4,7 @@
       <div class="account">
         <div style="width: 100%;">
           <div>
-            <div class="account-title">公司疫情</div>
+            <div class="account-title">社区疫情</div>
             <div class="login-title">{{status}}</div>
             <van-form @submit="onSubmit" v-if="status === STATUS.register">
               <van-field
@@ -139,30 +139,34 @@ export default {
     },
   },
   async beforeMount() {
-    // 请求用户数据
-    let userInfo = localStorage.getItem("userInfo");
-    if (userInfo) {
-      userInfo = JSON.parse(userInfo);
-      let res = await post({
-        path: `findUserById?id=${userInfo.id}`,
-        data: {},
-      });
-      if (res.code === "404") {
-        Dialog.alert({
-          title: "提示",
-          message: "请重新登录",
-          theme: "round-button",
-        }).then(() => {
-          localStorage.removeItem("userInfo");
-          // this.$router.push("/account");
+    try {
+      // 请求用户数据
+      let userInfo = localStorage.getItem("userInfo");
+      if (userInfo) {
+        userInfo = JSON.parse(userInfo);
+        let res = await post({
+          path: `findUserById?id=${userInfo.id}`,
+          data: {},
         });
-      } else if (res.code === "200") {
-        this.isLogin = true;
-        this.$datas.setUserInfoAction(res.data);
-        // console.log(this.$datas);
+        if (res.code === "404") {
+          Dialog.alert({
+            title: "提示",
+            message: "请重新登录",
+            theme: "round-button",
+          }).then(() => {
+            localStorage.removeItem("userInfo");
+            // this.$router.push("/account");
+          });
+        } else if (res.code === "200") {
+          this.isLogin = true;
+          this.$datas.setUserInfoAction(res.data);
+          // console.log(this.$datas);
+        }
+      } else {
+        this.isLogin = false;
       }
-    } else {
-      this.isLogin = false;
+    } catch (error) {
+      console.log(error);
     }
   },
   methods: {

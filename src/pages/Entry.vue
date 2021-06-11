@@ -1,7 +1,8 @@
 <template>
   <div class="entry">
     <div class="main">
-      <div class="title">公司疫情签到</div>
+      <div class="scanf" @click="scanf"></div>
+      <div class="title">社区疫情签到</div>
       <div class="slogen">众志成城 共抗疫情</div>
       <div class="validate">
         <ValidateScroll></ValidateScroll>
@@ -22,7 +23,7 @@
 
       <div class="qr">
         <div class="qr-date">{{curDate ? curDate : '日期'}}</div>
-        <div class="qr-qr"></div>
+        <div class="qr-qr" :style="{background: backgroundQr}"></div>
         <div class="qr-sign">
           今日是否签到:
           <span class="qr-status">{{isSign ? "是" : "否"}}</span>
@@ -41,6 +42,7 @@ import { Button, Dialog } from "vant";
 import ValidateScroll from "../components/ValidateScroll.vue";
 import { emitter } from "../utils/eventHub.js";
 import { post, get } from "../utils/fetch.js";
+import QRCode from "../utils/scanf/qrcode.js";
 export default {
   name: "Entry",
   data() {
@@ -50,6 +52,8 @@ export default {
       childPage: null,
       state: this.$datas.state,
       isSign: false,
+      backgroundQr: "",
+      start: new Date().valueOf(), // 开始时间
     };
   },
   computed: {
@@ -70,6 +74,9 @@ export default {
     },
   },
   methods: {
+    scanf() {
+      this.$router.push("/scanf");
+    },
     sleep(time) {
       return new Promise((resolve) => setTimeout(resolve, time));
     },
@@ -104,6 +111,11 @@ export default {
      */
     generateDate() {
       let date = new Date();
+      let dif = 1000 * 60 * 30; // 30分钟翻
+      if (date.valueOf() - this.start >= dif) {
+        this.start = date.valueOf();
+        this.generateQr();
+      }
       let month = date.getMonth() + 1;
       month = month < 10 ? `0${month}` : month;
       let day = date.getDate();
@@ -115,6 +127,35 @@ export default {
       let second = date.getSeconds();
       second = second < 10 ? `0${second}` : second;
       this.curDate = `${date.getFullYear()}-${month}-${day} ${hour}:${minute}:${second}`;
+    },
+    generateQr() {
+      if (this.$datas.state.userInfo) {
+        // console.log(QRCode);
+        const qrcode = new QRCode.Encoder();
+        // console.log(qrcode);
+
+        qrcode.setEncodingHint(true);
+        qrcode.setErrorCorrectionLevel(QRCode.ErrorCorrectionLevel.H);
+
+        // (await window.cookieStore.get("time")).value
+        let data = {
+          id: this.$datas.state.userInfo.id,
+          username: this.$datas.state.userInfo.username,
+          timestemp: new Date().valueOf(),
+        };
+        console.log(data);
+        qrcode.write(JSON.stringify(data));
+        // qrcode.write(new QRCode.QRByte("hello world\n"));
+        // qrcode.write(new QRCode.QRKanji("こんにちは世界"));
+
+        qrcode.make();
+        this.backgroundQr = `url(${qrcode.toDataURL(
+          10,
+          0
+        )}),linear-gradient(green, green)`;
+        console.log("重新生成二维码");
+        // console.log(qrcode.toDataURL(10, 0));
+      }
     },
   },
   async beforeMount() {
@@ -194,7 +235,9 @@ export default {
       console.log(error);
     }
   },
-  mounted() {},
+  async mounted() {
+    this.generateQr();
+  },
   unmounted() {
     console.log("unmounted");
     // clearInterval(this.InterId);
@@ -222,10 +265,21 @@ export default {
   width: calc(100vw - 20px);
   margin: 0 10px;
 }
+.scanf {
+  background: url(../assets/扫码.png);
+  background-size: cover;
+  width: 30px;
+  height: 30px;
+  position: fixed;
+  bottom: 125px;
+  right: 20px;
+  z-index: 1;
+}
 .main {
-  min-height: 100vh;
-  /* background: linear-gradient(rgb(206 237 245), #fff); */
-  background: linear-gradient(rgba(227 249 170), #fff);
+  position: relative;
+  /* min-height: 100vh; */
+  background: linear-gradient(rgb(206 237 245), #fff);
+  /* background: linear-gradient(rgba(227 249 170), #fff); */
 }
 .title {
   text-align: center;
@@ -285,11 +339,11 @@ export default {
   height: 200px;
   /* border: 1px solid red; */
   margin: 10px auto;
-  background: url(data:image/gif;base64,R0lGODdhewB7AIAAAAAAAP///ywAAAAAewB7AAAC/4yPqcvtD6OctNqLs968+w+G4kiW5omm6sq27gvH8kzX9o3n+gH0/g8MQoQMH693BCSXhqDzyXlKf0Ngw9hEZpVbZmAKjoKlVWpR+0Vj01x2ckzUrMuKtd26nefx7q5EfwF4heZ1Z8YGSObXFyFY4biQqDZ5GPfGZzgBqUkZZyjpVAgXuqjImPGJ2Um4V7k6Snnp2ob6mtlaB1UKq9pmuvlnG7vry4rY69kreysnXPwsStuaOsv8a2xBbT18Ou0sG50sHfi9uMyXC50AzHg9nl3efUwaye01+Cwulq+8HnamDgE7bfYwsLtH7ByvdMzobDhoLqG3hf5mcXr3CBvAdP/heB0CF9EBRJEetwU0Ga0jxWYlT3JDKbFdS4wUZrq8mTImQTg3QFmKuYOET3RAg4oY+rGoUZLVjO1kWJBcUhPiQCmEGrDW1BJVncYDKQ/eVg8/640zBbahTl1UiZrFijSnwJdsubrlWLGsvpAmyx6N+hQgLIVW8941CPirYZ4TC8+ltw+hTMiLxxD2erYuYosbG2NOq5Hp4If93nrOzC9rsJVa1T6+jBo0TXyjWeK7yje07L6JZ6++PVHyQGR0Ob8mTTOwvOFNb7oeSfvfY8fUZIOVC/1B7etrm6vEO/nDdlwVv5OfTD2qVsnCNYcNCfz4+w6u21OePzK9b9vwc9//h5TfZ/2BsJdp8kV3H2ywZSeaev6VgVZlxE0hXmngsSfhWPN0RaFQryCokmXlnQegbshxN11x46Hn4HyRnYdViNKZh5+JjbAVF4nu6aXijjZCaKGOzeUo306OtRbkPLu5xaNzPu53UZPg2dSkciLS9+SUVE7FoZE/ribliBvOFGNwp1WI04AKqmlmih0SWByGbhaIIFIRYpmmi2eyOSZqV+7TJZOHsajagUoxCJczRGpp3IWHftngkIJqWN2A+jkqVaWRlsjlhCCewCGQlE6qaZlteaedeyiGKhik6/0mJKYLkoqZXxlBScxzoZVkKm783ZiafXXOCGObry4noJum/9oKrHLHHukfkcyK6uuzydon7aDUGrsZr2LeaV2rb9rVEqPM0pnhtGSR+a2qsYoLbg7omrWopUnGMG+vxdbY6Az5LqYvv/V169GaBpb6rpIelrvnwR8CnKurt3rbJ6c0hqvwCAEmR2uw6e5K7K8O0Vvrw3MO+ueJsJLsp8kGJ6qhWL56yfGoW9672cyKgmzzzQNLpXNq56Lsc7+/uoNdb8Im/G9N8cAUXruxMY2z00LH2R2j5vZYqMxtXtpdgcxVm/PXyUKNNJ/Olt3n0lETCnV88Vp9UXxRXtvZyTGvPLKsqXa6n53a8v233WDibeDLBLNmNmMZz60uSxQHfWWgNScjejjjbZ+mKeSDLwV66KKPTnrppp+Oeuqqr856666/Dnvsss++VAEAOw==),
-    linear-gradient(green, green);
+  /* background: url(data:image/gif;base64,R0lGODdhewB7AIAAAAAAAP///ywAAAAAewB7AAAC/4yPqcvtD6OctNqLs968+w+G4kiW5omm6sq27gvH8kzX9o3n+gH0/g8MQoQMH693BCSXhqDzyXlKf0Ngw9hEZpVbZmAKjoKlVWpR+0Vj01x2ckzUrMuKtd26nefx7q5EfwF4heZ1Z8YGSObXFyFY4biQqDZ5GPfGZzgBqUkZZyjpVAgXuqjImPGJ2Um4V7k6Snnp2ob6mtlaB1UKq9pmuvlnG7vry4rY69kreysnXPwsStuaOsv8a2xBbT18Ou0sG50sHfi9uMyXC50AzHg9nl3efUwaye01+Cwulq+8HnamDgE7bfYwsLtH7ByvdMzobDhoLqG3hf5mcXr3CBvAdP/heB0CF9EBRJEetwU0Ga0jxWYlT3JDKbFdS4wUZrq8mTImQTg3QFmKuYOET3RAg4oY+rGoUZLVjO1kWJBcUhPiQCmEGrDW1BJVncYDKQ/eVg8/640zBbahTl1UiZrFijSnwJdsubrlWLGsvpAmyx6N+hQgLIVW8941CPirYZ4TC8+ltw+hTMiLxxD2erYuYosbG2NOq5Hp4If93nrOzC9rsJVa1T6+jBo0TXyjWeK7yje07L6JZ6++PVHyQGR0Ob8mTTOwvOFNb7oeSfvfY8fUZIOVC/1B7etrm6vEO/nDdlwVv5OfTD2qVsnCNYcNCfz4+w6u21OePzK9b9vwc9//h5TfZ/2BsJdp8kV3H2ywZSeaev6VgVZlxE0hXmngsSfhWPN0RaFQryCokmXlnQegbshxN11x46Hn4HyRnYdViNKZh5+JjbAVF4nu6aXijjZCaKGOzeUo306OtRbkPLu5xaNzPu53UZPg2dSkciLS9+SUVE7FoZE/ribliBvOFGNwp1WI04AKqmlmih0SWByGbhaIIFIRYpmmi2eyOSZqV+7TJZOHsajagUoxCJczRGpp3IWHftngkIJqWN2A+jkqVaWRlsjlhCCewCGQlE6qaZlteaedeyiGKhik6/0mJKYLkoqZXxlBScxzoZVkKm783ZiafXXOCGObry4noJum/9oKrHLHHukfkcyK6uuzydon7aDUGrsZr2LeaV2rb9rVEqPM0pnhtGSR+a2qsYoLbg7omrWopUnGMG+vxdbY6Az5LqYvv/V169GaBpb6rpIelrvnwR8CnKurt3rbJ6c0hqvwCAEmR2uw6e5K7K8O0Vvrw3MO+ueJsJLsp8kGJ6qhWL56yfGoW9672cyKgmzzzQNLpXNq56Lsc7+/uoNdb8Im/G9N8cAUXruxMY2z00LH2R2j5vZYqMxtXtpdgcxVm/PXyUKNNJ/Olt3n0lETCnV88Vp9UXxRXtvZyTGvPLKsqXa6n53a8v233WDibeDLBLNmNmMZz60uSxQHfWWgNScjejjjbZ+mKeSDLwV66KKPTnrppp+Oeuqqr856666/Dnvsss++VAEAOw==),
+    linear-gradient(green, green); */
   background-blend-mode: lighten;
   background-repeat: no-repeat;
-  background-size: cover;
+  background-size: cover !important;
 }
 .qr-status {
   color: green;

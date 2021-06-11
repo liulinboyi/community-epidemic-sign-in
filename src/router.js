@@ -1,6 +1,7 @@
 import {createRouter, createWebHashHistory} from 'vue-router'
 // eslint-disable-next-line
 import {store} from './utils/store.js'
+// import Scanf from "./pages/Scanf.vue"
 const routes = [
     {
         name: 'Home',
@@ -28,7 +29,11 @@ const routes = [
         name: "sign-info",
         path: "/sign-info",
         component: () => import ('./pages/SignInfo.vue')
-    },
+    }, {
+        name: "scanf",
+        path: "/scanf",
+        component: () => import ("./pages/Scanf.vue")
+    }
 ]
 
 export const router = createRouter({

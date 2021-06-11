@@ -1,8 +1,8 @@
 import {app} from '../main.js'
 // const baseUrl = "http://localhost/"
-// const baseUrl = "http://localhost:8080/"
-const baseUrl = "http://127.0.0.1:8080/"
-// const baseUrl = "http://192.168.31.102/"
+const baseUrl = "http://localhost:8080/"
+// const baseUrl = "http://127.0.0.1:8080/"
+// const baseUrl = "http://192.168.31.102:8080/"
 
 
 function isPromise(value) {
@@ -84,6 +84,8 @@ export async function post(options) {
             title: '提示',
             message: e.msg ? e.msg : '出错了！请稍后再试！',
             theme: 'round-button'
+        }).then(() => {
+            console.log("ok")
         });
         return Promise.reject(e.data ? e.data : e)
     }
