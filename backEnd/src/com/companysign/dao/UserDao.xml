@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.companysign.dao.UserDao">
+	<!--根据id查询客户信息 -->
+	<select id="findUserById" parameterType="Integer"
+		                               resultType="User">
+        select * from user where id = #{id}
+	</select>
+
+	<!--    分步查询-->
+	<resultMap id="UserByStep" type="User">
+		<id property="id" column="id"></id>
+		<result property="username" column="username"></result>
+		<result property="telephone" column="telephone"></result>
+        <result property="birthday" column="birthday"></result>
+        <result property="gender" column="gender"></result>
+        <result property="address" column="address"></result>
+        <result property="idcard" column="idcard"></result>
+		<association property="signs" column="id" select="getSignById">
+			<id property="sid" column="sid"></id>
+			<result property="address" column="address"></result>
+			<result property="contactTag" column="contactTag"></result>
+			<result property="statusTag" column="statusTag"></result>
+			<result property="temperature" column="temperature"></result>
+			<result property="userId" column="userId"></result>
+            <result property="time" column="time"></result>
+		</association>
+	</resultMap>
+	<!--第二步-->
+	<select id="getSignById" resultType="Sign">
+		select * from sign where userId=#{id} order by time DESC LIMIT 0,13;
+	</select>
+	<!--第一步-->
+	<select id="findUserSign" resultMap="UserByStep" parameterType="User">
+        select u.* from user as u where u.id =#{id};
+	</select>
+
+	<select id="login" resultType="User" parameterType="User">
+		select u.* from user as u where u.username =#{username};
+	</select>
+
+	<select id="findUserByName" resultType="User">
+		select * from user where username=#{username};
+	</select>
+
+	<select id="addUser" parameterType="User" >
+		insert into user(username,password,nickname,telephone,idcard)
+		values(#{username},#{password},#{nickname},#{telephone},#{idcard})
+	</select>
+
+	<select id="sign" parameterType="Sign" >
+		insert into sign(address,contactTag,statusTag,temperature,userId,time)
+		values(#{address},#{contactTag},#{statusTag},#{temperature},#{userId},#{time})
+	</select>
+    <!--获取最近一次签到信息-->
+	<select id="getRecentSignById" resultType="Sign" parameterType="User">
+		select * from sign where userId=#{id} order by time DESC LIMIT 0,1;
+	</select>
+</mapper>
