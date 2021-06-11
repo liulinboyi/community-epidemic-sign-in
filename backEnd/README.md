@@ -5,4 +5,4 @@
 
     推荐使用IDEA打开
 
-## [前端在这里](https://gitee.com/liulinboyi8023/community-epidemic-sign-in)
+## [前端在这里](../frontEnd/)
