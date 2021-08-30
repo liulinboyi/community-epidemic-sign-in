@@ -144,8 +144,13 @@ export default {
             // });
             // this.dates[res[0].index].isSign = true;
 
-            let index = signDate[new Date(dates[i].time).format("yyyy-MM-dd")];
-            this.dates[index].isSign = true;
+            let timeKey = new Date(dates[i].time).format("yyyy-MM-dd");
+
+            if (timeKey in signDate) {
+              let index =
+                signDate[new Date(dates[i].time).format("yyyy-MM-dd")];
+              this.dates[index].isSign = true;
+            }
           }
         }
         // console.log(this.dates);

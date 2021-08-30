@@ -20,12 +20,12 @@
           <div style="display: flex;align-items: center;">
             <van-field
               :border="false"
-              ref="basicInput"
+              ref="addressInput"
               style="flex: 1;"
               class="basic-input"
               v-model="location"
             />
-            <div @click="basicFocus" style="color: #1989fa;">填写</div>
+            <div @click="addressInput" style="color: #1989fa;">填写</div>
           </div>
         </div>
       </div>
@@ -63,13 +63,13 @@
             <van-field
               type="number"
               :border="false"
-              ref="basicInput"
+              ref="tempInput"
               style="flex: 1;"
               class="basic-input"
               v-model="temperature"
               placeholder="清输入当前体温"
             />
-            <div @click="basicFocus" style="color: #1989fa;">填写</div>
+            <div @click="tempInput" style="color: #1989fa;">填写</div>
           </div>
         </div>
         <div class="basic-confirm">
@@ -195,8 +195,11 @@ export default {
         });
       }
     },
-    basicFocus() {
-      this.$refs.basicInput.focus();
+    addressInput() {
+      this.$refs.addressInput.focus()
+    },
+    tempInput() {
+      this.$refs.tempInput.focus();
     },
   },
   components: {
