@@ -1,6 +1,6 @@
 <template>
   <div>
-    <van-popup v-model:show="show">
+    <van-popup :show="show" @update:show="show = $event">
       <div class="account">
         <div style="width: 100%;">
           <div>

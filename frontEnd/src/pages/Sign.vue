@@ -175,13 +175,13 @@ export default {
               title: "提示",
               message: res.msg,
               theme: "round-button",
-            }).then(() => {
+            }).then(async () => {
               this.location = "";
               this.checked = "";
               this.manychecked = [];
               this.temperature = "";
               this.ischecked = false;
-              this.$router.replace("/sign-info");
+              await this.$router.replace("/sign-info");
             });
           } catch (error) {
             console.log(error);
@@ -196,7 +196,7 @@ export default {
       }
     },
     addressInput() {
-      this.$refs.addressInput.focus()
+      this.$refs.addressInput.focus();
     },
     tempInput() {
       this.$refs.tempInput.focus();
