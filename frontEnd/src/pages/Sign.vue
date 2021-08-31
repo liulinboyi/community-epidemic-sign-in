@@ -182,6 +182,7 @@ export default {
               this.temperature = "";
               this.ischecked = false;
               await this.$router.replace("/sign-info");
+              this.$router.back();
             });
           } catch (error) {
             console.log(error);
